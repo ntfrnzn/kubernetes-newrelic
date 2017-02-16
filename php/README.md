@@ -23,6 +23,11 @@ Both the daemon and agent run from the same docker image, but with different
 configuration and commands.  The image is based on a stock php-fpm docker image
 and adds the New Relic binaries to it.
 
+```
+$ docker build -f Dockerfile -t ntfrnzn/newrelic-php .
+$ docker push ntfrnzn/newrelic-php
+```
+
 ### Configuration of the daemon
 
 The daemon configuration is stored in the kubernetes cluster as a configmap
