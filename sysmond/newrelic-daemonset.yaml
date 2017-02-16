@@ -1,0 +1,66 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: newrelic-agent
+  labels:
+    tier: monitoring
+    app: newrelic-agent
+    version: v1
+spec:
+  template:
+    metadata:
+      labels:
+        name: newrelic
+    spec:
+      hostPID: true
+      hostIPC: true
+      hostNetwork: true
+      containers:
+        - resources:
+            requests:
+              cpu: 0.15
+          securityContext:
+            privileged: true
+          env:
+            - name: NRSYSMOND_logfile
+              value: "/var/log/nrsysmond.log"
+          image: newrelic/nrsysmond
+          name: newrelic
+          env:
+            - name: NRSYSMOND_license_key
+              valueFrom:
+                secretKeyRef:
+                  name: newrelic
+                  key: license_key
+            - name: NRSYSMOND_logfile
+              valueFrom:
+                secretKeyRef:
+                  name: newrelic
+                  key: logfile
+            - name: NRSYSMOND_loglevel
+              valueFrom:
+                secretKeyRef:
+                  name: newrelic
+                  key: loglevel
+          volumeMounts:
+            - name: dev
+              mountPath: /dev
+            - name: run
+              mountPath: /var/run/docker.sock
+            - name: sys
+              mountPath: /sys
+            - name: log
+              mountPath: /var/log
+      volumes:
+        - name: dev
+          hostPath:
+              path: /dev
+        - name: run
+          hostPath:
+              path: /var/run/docker.sock
+        - name: sys
+          hostPath:
+              path: /sys
+        - name: log
+          hostPath:
+              path: /var/log
